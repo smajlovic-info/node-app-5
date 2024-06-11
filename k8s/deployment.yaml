@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app-5
+  namespace: default
+  labels:
+    backstage.io/kubernetes-id: node-app-5
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: node-app-5
+  template:
+    metadata:
+      labels:
+        app: node-app-5
+        backstage.io/kubernetes-id: node-app-5
+    spec:
+      containers:
+      - image: gcr.io/heptio-images/ks-guestbook-demo:0.2
+        name: node-app-5
+        ports:
+        - containerPort: 80

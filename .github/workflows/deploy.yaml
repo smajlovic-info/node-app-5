@@ -1,0 +1,45 @@
+name: Deploy App
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:                # Job-level permissions configuration starts here
+  contents: write           # 'write' access to repository contents
+  pull-requests: write      # 'write' access to pull requests
+
+jobs:
+  deploy_app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          path: source-repo
+          ref: 'main'
+
+      - name: Checkout target repo
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: 'smajlovic-info/deployment-config'
+          path: target-repo
+
+      - name: Copy files
+        run: |
+          # ls -all source-repo/argocd
+          # ls -all target-repo/deployment-configs/apps
+          tree .
+          cp -r source-repo/argocd/* target-repo/apps/
+
+      - name: Commit and push
+        run: |
+          cd target-repo
+          tree .
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "Deploy Application in ArgoCD" || exit 0
+          git push
